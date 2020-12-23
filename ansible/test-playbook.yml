@@ -1,0 +1,40 @@
+- name: Sample playbook
+  hosts: localhost
+  gather_facts: no
+  become: no
+  vars:
+    desired_state: stopped
+  vars_files:
+    config/aws.yml
+
+  tasks: 
+    - name: Detect running instances
+      ec2_instance_info:
+        filters:
+          instance-state-name: "running"
+      register: running_instances
+      when: desired_state == 'stopped'
+
+    - name: Detect stopped instances
+      ec2_instance_info:
+        filters:
+          instance-state-name: "stopped"
+      register: stopped_instances
+      when: desired_state == 'running'
+
+    - name: Stop instances
+      ec2:
+        region: "{{ region }}"
+        instance_ids: "{{ item.instance_id }}"
+        state: "{{ desired_state }}"
+      with_items: "{{ running_instances.instances }}"
+      when: desired_state == 'stopped'
+
+    - name: Start instances
+      ec2:
+        region: "{{ region }}"
+        instance_ids: "{{ item.instance_id }}"
+        state: "{{ desired_state }}"
+        wait: yes
+      with_items: "{{ stopped_instances.instances }}"
+      when: desired_state == 'running'

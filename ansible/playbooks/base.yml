@@ -1,0 +1,25 @@
+- name: create a directory
+  become: yes
+  hosts: all
+  remote_user: ec2-user
+
+  tasks:
+    block:
+      - name: format data drive
+        filesystem:
+          dev: /dev/xvdf
+          fstype: ext4
+        
+      - name: mount data dir
+        mount:
+          path: /usr/local/share/applications
+          src: /dev/xvdf
+          fstype: ext4
+          state: present
+        
+      - name: Create temp file
+        file:
+          path: /usr/local/share/applications/test.txt
+          state: touch
+          mode: '0644'
+    ignore_errors: yes
