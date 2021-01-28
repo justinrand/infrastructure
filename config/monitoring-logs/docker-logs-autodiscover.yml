@@ -1,0 +1,31 @@
+filebeat:
+  autodiscover.providers:
+    - type: docker
+      templates:
+        - condition.contains:
+            docker.container.image: nginx
+          config:
+            - module: nginx
+              access:
+                input:
+                  type: container
+                  paths:
+                    - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+              error:
+                input:
+                  type: container
+                  paths:
+                    - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+
+        # fallback config when no condition match:
+        - config:
+            - type: container
+              paths:
+                - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+
+output.elasticsearch:
+  hosts: ["172.31.12.57:9200"]
+
+setup.ilm.rollover_alias: "docker-logs-autodiscover"
+
+setup.template.enabled: false

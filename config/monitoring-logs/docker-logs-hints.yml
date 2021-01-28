@@ -1,0 +1,11 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+output.elasticsearch:
+  hosts: ["172.31.12.57:9200"]
+
+setup.ilm.rollover_alias: "docker-logs-hints"
+
+setup.template.enabled: false

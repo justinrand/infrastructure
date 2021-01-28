@@ -1,0 +1,14 @@
+filebeat.inputs:
+- type: container
+  paths:
+    - '/var/lib/docker/containers/*/*.log'
+  stream: "stdout"
+  processors:
+    - add_docker_metadata:
+
+output.elasticsearch:
+  hosts: ["172.31.12.57:9200"]
+
+setup.ilm.rollover_alias: "docker-logs"
+
+setup.template.enabled: false

@@ -1,0 +1,31 @@
+- name: VM Setup
+  hosts: all
+  remote_user: ec2-user
+  become: yes
+
+  tasks:
+    - name: Yum update
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Install yum utils
+      yum:
+        name: 'yum-utils'
+        state: latest
+
+    - name: Install Docker
+      yum:
+        enablerepo: 'https://download.docker.com/linux/centos/docker-ce.repo'
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        disable_gpg_check: yes
+        state: present
+
+    - name: Start Docker
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
