@@ -1,0 +1,33 @@
+- name: Sample playbook
+  hosts: localhost
+  gather_facts: no
+  become: no
+  vars:
+    desired_state: stopped
+  vars_files:
+    config/aws.yml
+
+  tasks: 
+    - name: Filebeat lifecycle policy
+      uri:
+        body_format: json
+        method: PUT
+        src: config/filebeat_policy.json
+        url: "http://10.0.0.22:9200/_ilm/policy/filebeat"
+        return_content: yes
+      register: filebeat
+
+    - debug: 
+        var: filebeat
+
+    - name: Metricbeat lifecycle policy
+      uri: 
+        body_format: json
+        method: PUT
+        src: config/metricbeat_policy.json
+        url: "http://10.0.0.22:9200/_ilm/policy/metricbeat"
+        return_content: yes
+      register: metricbeat
+
+    - debug: 
+        var: metricbeat
