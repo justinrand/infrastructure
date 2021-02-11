@@ -1,0 +1,3 @@
+environmentvariables.json
+.serverless/*
+node_modules/*
