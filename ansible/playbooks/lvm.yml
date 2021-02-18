@@ -1,0 +1,83 @@
+- name: update LVM configuration
+  become: yes
+  hosts: all
+  remote_user: ec2-user
+  vars:
+    my_instance:
+      root_device_name: /dev/sda
+    var_partition_size: 10
+    target_disk_size: 30
+    pv_name: /dev/sda2
+    lv_path: /dev/centos/var
+
+  tasks:
+    - debug:
+        var: hostvars[inventory_hostname]
+
+    - fail:
+
+    - name: Download cloud growpart
+      yum:
+        name: cloud-utils-growpart
+        state: latest
+    
+    # - name: get root device
+      # ec2_instance_info:
+        # instance_ids: 'i-00cd9a336c3fa1536'
+      # register: my_instance
+
+    # - debug:
+        # var: my_instance.instances[0].root_device_name
+
+    - name: Get LVM partition
+      shell: |
+        fdisk -l {{ my_instance.root_device_name }} | grep LVM | awk '{print $1}' | sed 's/\/dev\///g'
+      register: disk_name
+
+    - debug:
+        var: disk_name.stdout
+
+    - name: Get partition number
+      shell: |
+        lsblk | grep {{ disk_name.stdout }} | awk '{print $2}' | sed 's/[0-9]*\://g'
+      register: partition_num
+
+    - debug:
+        msg: "partition num is {{ partition_num.stdout }}"
+
+    - name: Test the resize operation
+      command: |
+        growpart -N {{ my_instance.root_device_name }} {{ partition_num.stdout }}
+      register: resize_test
+      failed_when: >
+        (resize_test.rc != 0) and
+        (resize_test.rc != 1)
+      changed_when: no
+
+    - debug:
+        var: resize_test.stdout
+
+    - name: Grow the partition
+      shell: |
+        growpart {{ my_instance.root_device_name }} {{ partition_num.stdout }}
+      when: '"NOCHANGE" not in resize_test.stdout'
+      register: growpart
+
+    - debug:
+        var: growpart.stdout
+
+    - name: Get pvname
+      command: | 
+        pvdisplay | grep -i 'PV Name' | awk '{print $3}'
+      register: pvname
+
+    - name: Test the pvresize
+      command: | 
+        pvresize -t {{ pvname.stdout }}
+      register: pvresize
+      failed_when: >
+        pvresize.rc != 0
+      changed_when: no
+
+    # - name: Resize the PV
+    #   command: |
