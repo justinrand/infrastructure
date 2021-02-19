@@ -1,0 +1,11 @@
+PUT my-index-000001
+{
+  "mappings": {
+    "properties": {
+      "location": {
+        "type": "geo_point",
+        "ignore_malformed": true
+      }
+    }
+  }
+}

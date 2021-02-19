@@ -8,9 +8,10 @@
   tasks:
     - name: Launch instance
       ec2:
-        image: ami-07d77c5fdbaa8bf25
+        image: ami-03d64741867e7bb94
         instance_profile_name: EC2FULL
         region: us-east-2
+        key_name: admin_key
         vpc_subnet_id: subnet-06221544c996c7042
         instance_tags:
           Name: custom
@@ -18,7 +19,7 @@
         instance_type: t2.micro
         user_data: |
           #!/bin/bash
-          apt install -y jq
+          yum install -y jq awscli
           INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
           echo here
           echo ${INSTANCE_ID}

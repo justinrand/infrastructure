@@ -1,0 +1,30 @@
+PUT _ingest/pipeline/my_pipe
+{
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.location = ['lat': ctx.lat, 'lon': ctx.lon]"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/my2
+{
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": """
+          if(ctx.lat != 0 && ctx.lon != 0){
+            ctx.location = ['lat': ctx.lat, 'lon': ctx.lon]
+          }
+          else{
+            ctx.location = ['lat': 0, 'lon': 0]
+          }
+        """
+      }
+    }
+  ]
+}
