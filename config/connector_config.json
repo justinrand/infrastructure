@@ -1,0 +1,15 @@
+{
+    "name": "simple-es-connector-3",
+    "config": {
+        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+        "connection.url": "http://10.0.0.22:9200",
+        "tasks.max": "1",
+        "topics": "elasticsearch-data",
+        "type.name": "_doc",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": "false",
+        "schema.ignore": "true",
+        "key.ignore": "true",
+        "behavior.on.malformed.documents": "WARN"
+    }
+}

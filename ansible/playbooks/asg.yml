@@ -1,0 +1,59 @@
+- name: Launch a custom EC2 instance
+  hosts: localhost
+  remote_user: ec2-user
+  vars_files:
+  - ../config/aws.yml
+  tasks:
+    - name: Get latest AMI ID
+      command: ../util/get-latest-ami.sh
+      register: latestami
+
+    - debug: var=latestami.stdout
+
+    - name: Create LC
+      ec2_lc:
+        name: mylc
+        image_id: "{{ latestami.stdout }}"
+        instance_profile_name: EC2FULL
+        region: "{{ region }}"
+        key_name: "{{ key_name }}"
+        # vpc_subnet_id: subnet-06221544c996c7042
+        # instance_tags:
+          # Name: custom
+        security_groups: ['default', 'allow_ssh', 'web_from_alb']
+        instance_type: t2.micro
+        user_data: |
+          #!/bin/bash
+          echo "hellp"
+          yum update -y
+          yum install -y httpd.x86_64
+          systemctl start httpd.service
+          systemctl enable httpd.service
+          echo "Hello World from $(hostname -f)" > /var/www/html/index.html
+
+    - name: Create ASG
+      ec2_asg:
+        launch_config_name: mylc
+        name: myasg
+        state: present
+        min_size: 2
+        max_size: 2
+        desired_capacity: 2
+        vpc_zone_identifier: ['subnet-06221544c996c7042', 'subnet-0c39ea5eeab4afc52', 'subnet-02ff17930f50fc626']
+        target_group_arns: arn:aws:elasticloadbalancing:us-east-2:741369372803:targetgroup/tf-20210114235845860300000005/67d2aff61d09ba6b
+        tags:
+          - Name: mylc-1
+
+    # - name: Get instance IP
+    #   ec2_instance_info:
+    #     filters:
+    #       "tag:Name": custom
+    #       instance-state-name: "running"
+    #   register: instance_info
+    #   tags: always
+
+    # - debug: var=instance_info
+    #   tags: always
+
+    # - debug: var=instance_info.instances[0].network_interfaces[0].association.public_ip
+    #   tags: always

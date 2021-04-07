@@ -1,0 +1,18 @@
+Jenkinsfile in t-infrastructure
+    - git commit builds zip
+    - publish to s3 bucket / nexus repo
+    - if branch == Devops
+        call Deploy job
+
+Deploy
+    - run infrastructure install ?
+
+
+Lambda for AMI creation
+    - Triggers
+        - SNS topic
+        - API call
+    - git clone infrastructure repo / pull down tar from s3
+    - variables
+        - env
+        - type

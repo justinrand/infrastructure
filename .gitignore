@@ -1,0 +1,10 @@
+.serverless
+*.pem
+*.cert
+*.crt
+*secret*
+*.pyc
+__pycache__
+vendor/
+venv
+node_modules
