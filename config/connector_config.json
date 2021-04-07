@@ -1,5 +1,5 @@
 {
-    "name": "simple-es-connector-3",
+    "name": "simple-es-connector-7",
     "config": {
         "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
         "connection.url": "http://10.0.0.22:9200",

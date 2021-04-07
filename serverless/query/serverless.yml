@@ -7,45 +7,22 @@ provider:
   lambdaHashingVersion: 20201221
   region: us-east-2
 
-plugins:
-  - serverless-python-requirements
+package:
+  patterns:
+    - '!.gitignore'
+    - handler.py
 
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-# environment: 
-  # tokenCode: ${file(environmentvariables.json):tokenCode}
-
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.py
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.py
-#    - exclude-me-dir/**
+# plugins:
+  # - serverless-python-requirements
 
 functions:
   query:
     handler: handler.issue_comment
     environment: ${file(environmentvariables.json)}
 
-    events:
-      - schedule: cron(33 19 * * ? *)
+    layers:
+      - "${cf:ami-creator-dev.PythondepsLambdaLayerQualifiedArn}"
+
 
 #    Define function environment variables here
     # environment: 

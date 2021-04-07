@@ -27,6 +27,7 @@ def issue_comment(event, context):
 
     print("Python version:")
     print(sys.version)
+    print("hello world")
 
 if __name__ == "__main__":
     issue_comment('','')

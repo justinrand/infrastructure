@@ -14,6 +14,13 @@ layers:
 # plugins:
   # - serverless-python-requirements
 
+package:
+  include:
+    - '*.py'
+  exclude:
+    - 'venv/**'
+    - 'vendor/**'
+
 functions:
   ami-creator:
     handler: lambda_function.lambda_handler
@@ -22,6 +29,14 @@ functions:
       envs: "dev test prod"
     layers:
       - {Ref: PythondepsLambdaLayer}
+    package:
+      exclude:
+        - 'venv'
+        - 'vendor'
+        - 'node_modules'
+        - '__pycache__'
+      include:
+
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
