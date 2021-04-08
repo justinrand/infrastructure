@@ -1,0 +1,31 @@
+- name: Create RDS
+  hosts: localhost
+  vars:
+    - rds_username: postgres
+    - rds_user_password: postgresadmin
+
+  tasks:
+    - name: Create database
+      rds_instance:
+        allocated_storage: 20
+        allow_major_version_upgrade: no
+        auto_minor_version_upgrade: yes
+        backup_retention_period: 7
+        copy_tags_to_snapshot: yes
+        db_instance_identifier: nucleus-postgres
+        db_instance_class: db.t2.micro
+        db_name: postgres
+        engine: postgres
+        # engine_version: 
+        # kms_key_id: 
+        master_user_password: "{{ rds_user_password }}"
+        master_username: "{{ rds_username }}"
+        multi_az: no
+        publicly_accessible: no
+        region: us-east-2
+        state: present
+        storage_encrypted: no
+        storage_type: standard
+        vpc_security_group_ids:
+          - sg-0d4705e063dd51dbe
+
