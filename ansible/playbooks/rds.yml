@@ -5,6 +5,29 @@
     - rds_user_password: postgresadmin
 
   tasks:
+
+    - name: Create DB subnet group
+      rds_subnet_group:
+        name: rds-subnet-group
+        description: "new subnet group for rds"
+        region: us-east-2
+        subnets:
+          - subnet-0dbe2ec9e2d9176f6
+          - subnet-0b3b1c865ee31d5e0
+          - subnet-0f680b9188668ecba
+        state: present
+    
+    - name: Set parameters
+      rds_param_group:
+        engine: postgres12
+        name: nuc-postgres12
+        description: "Default postgres params"
+        state: present
+        params:
+          authentication_timeout: 300
+          application_name: "nuc"
+        region: us-east-2
+
     - name: Create database
       rds_instance:
         allocated_storage: 20
@@ -12,9 +35,11 @@
         auto_minor_version_upgrade: yes
         backup_retention_period: 7
         copy_tags_to_snapshot: yes
-        db_instance_identifier: nucleus-postgres
+        db_instance_identifier: nuc-postgres
         db_instance_class: db.t2.micro
+        db_subnet_group_name: rds-subnet-group
         db_name: postgres
+        db_parameter_group_name: nuc-postgres12
         engine: postgres
         # engine_version: 
         # kms_key_id: 
@@ -28,4 +53,4 @@
         storage_type: standard
         vpc_security_group_ids:
           - sg-0d4705e063dd51dbe
-
+        wait: yes
