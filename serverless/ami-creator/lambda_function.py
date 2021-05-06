@@ -4,6 +4,10 @@ from requests_toolbelt.adapters import host_header_ssl
 import os
 import sys
 
+URL = "https://api.github.com/repos/justinrand/infrastructure"
+USER = "justinrand"
+PASSWORD = os.environ['tokenCode']
+
 def lambda_handler(event, context):
     # envs=['dev', 'dev-i', 'devops', 'int', 'test', 'prod']
     envs_to_build = os.environ['envs'].split()
@@ -14,6 +18,11 @@ def lambda_handler(event, context):
     s.mount('https://', host_header_ssl.HostHeaderSSLAdapter())
     # r = s.get("https://93.184.216.34", headers={"Host": "example.org"})
     # r = requests.post(url = URL, json=comment, auth=(USER,PASSWORD))
+
+    r = s.post(url = URL, auth=(USER,PASSWORD))
+
+    print(r.status_code)
+    print(r.text)
 
     for x in envs_to_build:
         print("Starting job for " + x)
