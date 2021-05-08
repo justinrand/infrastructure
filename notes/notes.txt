@@ -1,7 +1,7 @@
 SNS trigger ------> ami-creator Lambda ---------------->
                       - Get latest infra tag
                       - Build AMIs
-                        - All environments
+                        - Pass environments
+                        - Pass tag
                       - Update S3 AMI file
                       - Update AMI variables in Deploy
-                      
