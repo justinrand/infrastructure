@@ -1,0 +1,21 @@
+---
+- name: Create instance
+  ec2:
+    image: "{{ simple_provision_ami_id }}"
+    instance_profile_name: "{{ simple_provision_instance_profile }}"
+    region: "{{ ec2_region }}"
+    key_name: "{{ key_name }}"
+    vpc_subnet_id: "{{ simple_provision_subnet_id }}"
+    instance_tags: "{{ simple_provision_tags }}"
+    groups: "{{ simple_provision_security_groups }}"
+    instance_type: "{{ simple_provision_instance_type }}"
+    wait: yes
+    user_data: "{{ simple_provision_user_data }}"
+
+  register: simple_provision_instances
+
+- name: Add new instance to Host group
+  add_host:
+    hostname: "{{ item.public_ip }}"
+    group: new_instances
+  with_items: "{{ simple_provision_instances.instances }}"

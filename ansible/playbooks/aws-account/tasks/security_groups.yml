@@ -1,0 +1,21 @@
+- name: Create Gateway security groups
+  block: 
+    - ec2_group:
+        name: all_personal_traffic
+        description: "personal traffic"
+        vpc_id: "{{ gateway_vpc.vpcs[0].id }}"
+        rules:
+          - proto: all
+            cidr_ip: "{{ my_ip_address }}/32"
+        state: present
+
+    - ec2_group:
+        name: allow_ssh
+        description: "allow personal ssh"
+        vpc_id: "{{ gateway_vpc.vpcs[0].id }}"
+        rules:
+          - proto: tcp
+            from_port: 0
+            to_port: 22
+            cidr_ip: "{{ my_ip_address }}/32"
+        state: present

@@ -1,0 +1,30 @@
+- name: Setup AWS Account
+  hosts: localhost
+  vars_files:
+    - ../../config/aws.yml
+
+  tasks: 
+    - name: VPC info
+      block: 
+        - name: Get Gateway VPC info
+          ec2_vpc_net_info:
+            filters: 
+              "tag:Name": Gateway
+          register: gateway_vpc
+
+        - debug: var=gateway_vpc
+
+        - name: Get VPC info
+          ec2_vpc_net_info:
+            filters: 
+              "tag:Name": Storage
+          register: storage_vpc
+
+        - debug: var=storage_vpc
+      tags: [vpc]
+
+    - import_tasks: tasks/security_groups.yml
+      tags: [security_groups]
+
+    - import_tasks: tasks/buckets.yml
+      tags: [buckets]    

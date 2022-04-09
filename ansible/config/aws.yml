@@ -1,2 +1,7 @@
 region: us-east-2
+ec2_region: "{{ region }}"
 key_name: admin_key
+remote_user: ec2-user
+aws_account_id: 741369372803
+
+my_ip_address: 108.18.96.6

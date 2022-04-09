@@ -1,0 +1,11 @@
+- name: Create buckets
+  tags: 
+    - buckets
+  block:
+    - name: create test bucket
+      s3_bucket:
+        name: "{{ item.bucket_name }}"
+        policy: "{{ lookup('template', item.policy ) }}"
+      with_items:
+        - {bucket_name: 'jrand-test-bucket', policy: 'bucket-policy-1.json.j2'}
+  when: true

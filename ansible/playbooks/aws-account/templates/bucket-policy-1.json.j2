@@ -1,0 +1,20 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "Statement1",
+			"Principal": {
+                "AWS": [
+                    "arn:aws:iam::{{ aws_account_id }}:role/lambda_role"
+                ]
+            },
+			"Effect": "Allow",
+			"Action": [
+				"s3:*"
+			],
+			"Resource": [
+				"arn:aws:s3:::{{ item.bucket_name }}"
+			]
+		}
+	]
+}

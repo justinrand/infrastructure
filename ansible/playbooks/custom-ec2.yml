@@ -41,52 +41,16 @@
     - name: debug
       debug: var=new_instance
 
-    - name: Create extra volume
-      ec2_vol:
-        device_name: /dev/xvdf
-        instance: "{{ item.id }}"
-        volume_size: 20
-        delete_on_termination: no
-        state: present
-        region: "{{ region }}"
-      with_items: "{{ new_instance.instances }}"
-      register: new_volume
-
-    - debug: var=new_volume
-
-    - name: Wait for volume to be in use
-      ec2_vol_info:
-        filters: 
-          volume-id: "{{ item.volume_id }}"
-      register: vol_info
-      # until: vol_info.results.volumes.status == "in-use"
-      # retries: 5
-      # delay: 5
-      with_items: "{{ new_volume.results }}"
-
-    - debug: var=vol_info.results
-
 - name: Do stuff on remote
-  hosts: new_instances
+  hosts: all
   remote_user: ec2-user
+  tags: ["configure"]
   become: true
 
   tasks:
-    - name: Format extra device
-      filesystem: 
-        dev: /dev/xvdf
-        fstype: ext4
-
-    - name: Mount device to data
-      mount:
-        src: /dev/xvdf
-        path: /data
-        state: mounted
-        fstype: ext4
-
     - name: Create temp file
       file:
-        path: /data/myfile.txt
+        path: /home/ec2-user/myfile.txt
         state: touch
         owner: ec2-user
         group: ec2-user
@@ -94,21 +58,7 @@
 
     - name: Echo some stuff to file
       shell: >-
-        echo "here is my first file" > /data/myfile.txt
-
-- name: Return to localhost and take snapshot
-  hosts: localhost
-  become: no
-
-  tasks:
-
-    - debug: var=new_volume
-    - name: Create volume snapshot
-      ec2_snapshot:
-        volume_id: "{{ item.volume_id }}"
-        wait: yes
-        state: present
-      with_items: "{{ new_volume.results }}"
+        echo "here is my first file" > /home/ec2-user/myfile.txt
 
     # - name: Format instance
 # 
