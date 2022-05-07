@@ -19,17 +19,15 @@
         vpc_subnet_id: subnet-06221544c996c7042
         instance_tags:
           Name: custom
-        groups: ['default', 'allow_ssh', 'web_from_alb']
+        groups: ['default', 'allow_ssh']
         instance_type: t2.micro
         wait: yes
         user_data: |
           #!/bin/bash
           echo "hellp"
           yum update -y
-          yum install -y httpd.x86_64
-          systemctl start httpd.service
-          systemctl enable httpd.service
-          echo "Hello World from $(hostname -f)" > /var/www/html/index.html
+          yum install -y squid
+          chkconfig squid on
       register: new_instance
 
     - name: Add new instance to Host group
@@ -42,7 +40,7 @@
       debug: var=new_instance
 
 - name: Do stuff on remote
-  hosts: all
+  hosts: new_instances
   remote_user: ec2-user
   tags: ["configure"]
   become: true
